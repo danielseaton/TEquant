@@ -40,6 +40,9 @@ parser.add_argument("-o",
 parser.add_argument("--nofilter",
                     action="store_true",
                     help="If specified, don't filter out rows with zero counts across all samples")
+parser.add_argument("--normalise",
+                    action="store_true",
+                    help="If specified, normalise reads by the total number of mapped reads in each sample.")
 
 args = parser.parse_args()
 
@@ -65,11 +68,15 @@ summary_df = pd.concat(list_of_dfs,axis=1)
 rows_to_sum = ['Assigned','Unassigned_Ambiguity','Unassigned_NoFeatures']
 total_mapped_reads = summary_df.loc[rows_to_sum,:].apply(sum)
 
-eDF.loc['_total_mapped_reads']=total_mapped_reads
-
 #Check that the indices line up correctly (i.e. that summary and count files match up)
 assert(len(total_mapped_reads.index)==len(eDF.columns))
 assert(len(set(total_mapped_reads.index)&set(eDF.columns))==len(total_mapped_reads.index))
+
+if args.normalise:
+    eDF = eDF/total_mapped_reads
+else:
+    #Store total mapped reads for downstream processing
+    eDF.loc['_total_mapped_reads']=total_mapped_reads
 
 if not args.nofilter:
     eDF = eDF.loc[~(eDF==0).all(axis=1)]
