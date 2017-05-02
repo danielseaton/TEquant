@@ -73,7 +73,7 @@ assert(len(total_mapped_reads.index)==len(eDF.columns))
 assert(len(set(total_mapped_reads.index)&set(eDF.columns))==len(total_mapped_reads.index))
 
 if args.normalise:
-    eDF = eDF/total_mapped_reads*1000000
+    eDF = eDF/float(total_mapped_reads)*1000000
 else:
     #Store total mapped reads for downstream processing
     eDF.loc['_total_mapped_reads']=total_mapped_reads
