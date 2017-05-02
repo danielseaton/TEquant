@@ -42,7 +42,7 @@ parser.add_argument("--nofilter",
                     help="If specified, don't filter out rows with zero counts across all samples")
 parser.add_argument("--normalise",
                     action="store_true",
-                    help="If specified, normalise reads by the total number of mapped reads in each sample.")
+                    help="If specified, normalise to counts per million reads (where reads is the total number of mapped reads in each sample).")
 
 args = parser.parse_args()
 
@@ -73,7 +73,7 @@ assert(len(total_mapped_reads.index)==len(eDF.columns))
 assert(len(set(total_mapped_reads.index)&set(eDF.columns))==len(total_mapped_reads.index))
 
 if args.normalise:
-    eDF = eDF/total_mapped_reads
+    eDF = eDF/total_mapped_reads*1000000
 else:
     #Store total mapped reads for downstream processing
     eDF.loc['_total_mapped_reads']=total_mapped_reads
