@@ -5,6 +5,14 @@ import os
 import argparse
 import fileinput
 
+'''Merge outputs from multiple featurecounts output files.
+
+Example usage for merging outputs for all featurecount output files in a results directory:
+
+"python merge_featurecounts_results.py -i /nfs/leia/research/stegle/dseaton/hipsci/TEquantification/data/featurecounts_all/*/*.txt -s /nfs/leia/research/stegle/dseaton/hipsci/TEquantification/data/featurecounts_all/*/*.summary -o outfile.txt"
+
+'''
+
 parser = argparse.ArgumentParser(description='A script to concatenate output from featurecounts.')
 parser.add_argument("-i",
                     type=str,
