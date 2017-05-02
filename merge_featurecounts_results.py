@@ -39,6 +39,8 @@ args = parser.parse_args()
 list_of_dfs = []
 for filename in args.raw_count_filenames:
     df = pd.read_csv(filename,sep='\t',index_col=0,header=1)
+    #Basic check on file format
+    assert(len(df.columns)==6)
     #Select only the counts, which are in the last column (which has a variable column name)
     df = df.ix[:,-1]
     list_of_dfs.append(df)
@@ -56,6 +58,8 @@ rows_to_sum = ['Assigned','Unassigned_Ambiguity','Unassigned_NoFeatures']
 total_mapped_reads = summary_df.loc[rows_to_sum,:].apply(sum)
 
 eDF.loc['_total_mapped_reads']=total_mapped_reads
+
+#Check that the indices line up correctly (i.e. that summary and count files match up)
 assert(len(total_mapped_reads.index)==len(eDF.columns))
 assert(len(set(total_mapped_reads.index)&set(eDF.columns))==len(total_mapped_reads.index))
 
