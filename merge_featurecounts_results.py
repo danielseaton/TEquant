@@ -37,9 +37,9 @@ parser.add_argument("-o",
                     action='store',
                     help='Path of output file.'
                     )
-parser.add_argument("--nofilter",
+parser.add_argument("--filterzeroes",
                     action="store_true",
-                    help="If specified, don't filter out rows with zero counts across all samples")
+                    help="If specified, filter out rows with zero counts across all samples")
 parser.add_argument("--normalise",
                     action="store_true",
                     help="If specified, normalise to counts per million reads (where reads is the total number of mapped reads in each sample).")
@@ -78,7 +78,7 @@ else:
     #Store total mapped reads for downstream processing
     eDF.loc['_total_mapped_reads']=total_mapped_reads
 
-if not args.nofilter:
+if args.filterzeroes:
     eDF = eDF.loc[~(eDF==0).all(axis=1)]
 
 eDF.to_csv(args.output_filename,sep='\t')
