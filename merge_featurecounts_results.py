@@ -33,9 +33,9 @@ parser.add_argument("-s",
 parser.add_argument("-o",
                     type=str,
                     default='',
-                    dest='output_filename',
+                    dest='output_prefix',
                     action='store',
-                    help='Path of output file.'
+                    help='Output file prefix. Output files will be {output_prefix}_counts.tsv and {output_prefix}_features.tsv'
                     )
 parser.add_argument("--filterzeroes",
                     action="store_true",
@@ -47,12 +47,15 @@ assert(len(args.raw_count_filenames)==len(args.summary_filenames))
 
 #Concatenate featurecounts files
 list_of_dfs = []
-for filename in args.raw_count_filenames:
-    df = pd.read_csv(filename,sep='\t',index_col=0,header=1)
+for idx,filename in enumerate(args.raw_count_filenames):
+    df_temp = pd.read_csv(filename,sep='\t',index_col=0,header=1)
+    if idx==0:
+        #Feature dataframe should be the same across all samples
+        fDF=df_temp.ix[:,:5]
     #Basic check on file format
-    assert(len(df.columns)==6)
+    assert(len(df_temp.columns)==6)
     #Select only the counts, which are in the last column (which has a variable column name)
-    df = df.ix[:,-1]
+    df = df_temp.ix[:,-1]
     list_of_dfs.append(df)
 
 eDF = pd.concat(list_of_dfs,axis=1)
@@ -77,4 +80,5 @@ eDF = pd.concat([eDF,summary_df])
 assert(len(summary_df.columns)==len(eDF.columns))
 assert(len(set(summary_df.columns)&set(eDF.columns))==len(eDF.columns))
 
-eDF.to_csv(args.output_filename,sep='\t')
+fDF.to_csv(args.output_prefix+'_features.tsv',sep='\t')
+eDF.to_csv(args.output_prefix+'_counts.tsv',sep='\t')
