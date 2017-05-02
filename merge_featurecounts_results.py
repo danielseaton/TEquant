@@ -43,6 +43,8 @@ parser.add_argument("--filterzeroes",
 
 args = parser.parse_args()
 
+assert(len(args.raw_count_filenames)==len(args.summary_filenames))
+
 #Concatenate featurecounts files
 list_of_dfs = []
 for filename in args.raw_count_filenames:
