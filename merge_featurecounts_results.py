@@ -40,9 +40,6 @@ parser.add_argument("-o",
 parser.add_argument("--filterzeroes",
                     action="store_true",
                     help="If specified, filter out rows with zero counts across all samples")
-parser.add_argument("--normalise",
-                    action="store_true",
-                    help="If specified, normalise to counts per million reads (where reads is the total number of mapped reads in each sample).")
 
 args = parser.parse_args()
 
@@ -58,6 +55,11 @@ for filename in args.raw_count_filenames:
 
 eDF = pd.concat(list_of_dfs,axis=1)
 
+
+if args.filterzeroes:
+    eDF = eDF.loc[~(eDF==0).all(axis=1)]
+
+
 #Parse featurecounts summary file to get total numbers of aligned reads used in each case
 list_of_dfs = []
 for filename in args.summary_filenames:
@@ -65,20 +67,12 @@ for filename in args.summary_filenames:
     list_of_dfs.append(df)
 summary_df = pd.concat(list_of_dfs,axis=1)
 
-rows_to_sum = ['Assigned','Unassigned_Ambiguity','Unassigned_NoFeatures']
-total_mapped_reads = summary_df.loc[rows_to_sum,:].apply(sum)
+summary_df.index = pd.Index(['_'+x.lower() for x in summary_df.index])
+
+eDF = pd.concat([eDF,summary_df])
 
 #Check that the indices line up correctly (i.e. that summary and count files match up)
-assert(len(total_mapped_reads.index)==len(eDF.columns))
-assert(len(set(total_mapped_reads.index)&set(eDF.columns))==len(total_mapped_reads.index))
-
-if args.normalise:
-    eDF = eDF/float(total_mapped_reads)*1000000
-else:
-    #Store total mapped reads for downstream processing
-    eDF.loc['_total_mapped_reads']=total_mapped_reads
-
-if args.filterzeroes:
-    eDF = eDF.loc[~(eDF==0).all(axis=1)]
+assert(len(summary_df.columns)==len(eDF.columns))
+assert(len(set(summary_df.columns)&set(eDF.columns))==len(eDF.columns))
 
 eDF.to_csv(args.output_filename,sep='\t')
