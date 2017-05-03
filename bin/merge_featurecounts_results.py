@@ -37,7 +37,7 @@ parser.add_argument("-o",
                     action='store',
                     help='Output file prefix. Output files will be {output_prefix}_counts.tsv and {output_prefix}_features.tsv'
                     )
-parser.add_argument("--filterzeroes",
+parser.add_argument("--filterzeros",
                     action="store_true",
                     help="If specified, filter out rows with zero counts across all samples")
 
@@ -61,7 +61,7 @@ for idx,filename in enumerate(args.raw_count_filenames):
 eDF = pd.concat(list_of_dfs,axis=1)
 
 
-if args.filterzeroes:
+if args.filterzeros:
     eDF = eDF.loc[~(eDF==0).all(axis=1)]
 
 
