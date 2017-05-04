@@ -60,11 +60,15 @@ output_file.write(output_header)
 while True:
     try:
         next_lines = [x.next() for x in file_iterators]
-        values = [x.strip().split('\t')[6] for x in next_lines]
+        split_lines = [x.strip().split('\t') for x in next_lines]
+        values = [x[6] for x in split_lines]
+        rownames = [x[0] for x in split_lines]
+        #Assert that all rownames are the same
+        assert(len(set(rownames))==1)
         if args.filterzeros:
             if all([x=='0' for x in values]):
                 continue
-        gene_identifier = next_lines[0].strip().split('\t')[0]
+        gene_identifier = rownames[0]
         line = gene_identifier +'\t' + '\t'.join(values) + '\n'
         output_file.write(line)
     except StopIteration:
