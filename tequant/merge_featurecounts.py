@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def merge_featurecounts_by_dataframe(input_filenames,summary_filenames,output_prefix,filterzeros):
+def merge_featurecounts_by_dataframe(raw_count_filenames,summary_filenames,output_prefix,filterzeros):
     '''Merge outputs from multiple featurecounts output files.'''
 
     assert(len(raw_count_filenames)==len(summary_filenames))
