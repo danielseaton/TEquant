@@ -46,12 +46,22 @@ args = parser.parse_args()
 assert(len(args.raw_count_filenames)==len(args.summary_filenames))
 
 
+output_file = open(args.output_prefix+'_counts.tsv','w')
+
 nF = len(args.raw_count_filenames)
 file_iterators = [open(f,'r') for f in args.raw_count_filenames]
-output_file = open(args.output_prefix+'_counts.tsv','w')
-header = 'GeneID\t'+'\t'.join([x.next().strip().split('\t')[1] for x in file_iterators]) + '\n'
-output_file.write(header)
-while file_iterators[0]:
-    line = file_iterators[0].next() + '\t'.join([x.next().split('\t')[1] for x in file_iterators[1:]]) + '\n'
-    output_file.write(line)
+#First line is thrown away
+first_lines = [x.next() for x in file_iterators]
+#Second line gives info for the header
+header_lines = [x.next() for x in file_iterators]
+output_header = 'GeneID\t'+'\t'.join([x.strip()[6] for x in first_lines]) + '\n'
+output_file.write(output_header)
+while True:
+    try:
+        next_lines = [x.next() for x in file_iterators]
+        line = next_lines[0].strip().split('\t')[0] + '\t'.join([x.strip().split('\t')[6] for x in next_lines]) + '\n'
+        output_file.write(line)
+    except StopIteration:
+        #files are empty
+        break
 output_file.close()
