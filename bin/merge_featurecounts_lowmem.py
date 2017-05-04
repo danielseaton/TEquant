@@ -55,7 +55,7 @@ first_lines = [x.next() for x in file_iterators]
 #Second line gives info for the header
 header_lines = [x.next() for x in file_iterators]
 column_names = [x.strip().split('\t')[6] for x in header_lines]
-output_header = 'GeneID\t'+'\t'.join(column_names) + '\n'
+output_header = '\t'+'\t'.join(column_names) + '\n'
 output_file.write(output_header)
 while True:
     try:
