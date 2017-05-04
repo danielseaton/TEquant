@@ -54,7 +54,7 @@ file_iterators = [open(f,'r') for f in args.raw_count_filenames]
 first_lines = [x.next() for x in file_iterators]
 #Second line gives info for the header
 header_lines = [x.next() for x in file_iterators]
-output_header = 'GeneID\t'+'\t'.join([x.strip()[6] for x in first_lines]) + '\n'
+output_header = 'GeneID\t'+'\t'.join([x.strip().split('\t')[6] for x in header_lines]) + '\n'
 output_file.write(output_header)
 while True:
     try:
