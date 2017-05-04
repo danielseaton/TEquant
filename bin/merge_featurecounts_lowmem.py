@@ -54,7 +54,8 @@ file_iterators = [open(f,'r') for f in args.raw_count_filenames]
 first_lines = [x.next() for x in file_iterators]
 #Second line gives info for the header
 header_lines = [x.next() for x in file_iterators]
-output_header = 'GeneID\t'+'\t'.join([x.strip().split('\t')[6] for x in header_lines]) + '\n'
+column_names = [x.strip().split('\t')[6] for x in header_lines]
+output_header = 'GeneID\t'+'\t'.join(column_names) + '\n'
 output_file.write(output_header)
 while True:
     try:
@@ -69,4 +70,23 @@ while True:
     except StopIteration:
         #files are empty
         break
+
+#Add summary lines to the output. Order of addition may be different to above
+file_iterators = [open(f,'r') for f in args.summary_filenames]
+header_lines = [x.next() for x in file_iterators]
+summary_column_names = [x.strip().split('\t')[1] for x in header_lines]
+column_to_file_map = dict([(name,f) for name,f in zip(summary_column_names,file_iterators)])
+
+while True:
+    try:
+        next_lines = [column_to_file_map[x].next() for x in column_names]
+        values = [x.strip().split('\t')[1] for x in next_lines]
+        row_identifier = '_'+ next_lines[0].strip().split('\t')[0].lower()
+        line = row_identifier +'\t' + '\t'.join(values) + '\n'
+        output_file.write(line)
+    except StopIteration:
+        #files are empty
+        break
+
 output_file.close()
+
