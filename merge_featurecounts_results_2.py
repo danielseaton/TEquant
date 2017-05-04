@@ -59,7 +59,12 @@ output_file.write(output_header)
 while True:
     try:
         next_lines = [x.next() for x in file_iterators]
-        line = next_lines[0].strip().split('\t')[0] + '\t'.join([x.strip().split('\t')[6] for x in next_lines]) + '\n'
+        values = [x.strip().split('\t')[6] for x in next_lines]
+        if args.filterzeros:
+            if all([x=='0' for x in values]):
+                continue
+        gene_identifier = next_lines[0].strip().split('\t')[0]
+        line = gene_identifier +'\t' + '\t'.join(values) + '\n'
         output_file.write(line)
     except StopIteration:
         #files are empty
