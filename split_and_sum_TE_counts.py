@@ -65,7 +65,7 @@ levels = ['gene_id','family_id','class_id'] #Must be in increasing level in heir
 previous_level = 'transcript_id' #start with the most basic element
 for level in levels:
     # Make an index for the TE dataframe at this level of description
-    new_TE_index = list(TE_df[level]) + footer_ids
+    new_TE_index = list(set(TE_df[level])) + footer_ids
     output_eDF = pd.DataFrame(0,columns=eDF.columns,index=new_TE_index)
     output_eDF.loc[footer_ids,:] = eDF.loc[footer_ids,:]
 
