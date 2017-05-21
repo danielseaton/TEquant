@@ -53,14 +53,13 @@ def invert_strand(iv):
     elif iv2.strand == "-":
         iv2.strand = "+"
     else:
-        raise ValueError, "Illegal strand"
+        raise ValueError("Illegal strand")
     return iv2
 
 def output_counts(outfile,count_dict):
     with open(outfile,'w') as f:
         for key in count_dict:
             f.write('{key}\t{count}\n'.format(key=key,count=count_dict[key]))
-
 
 
 if __name__=='__main__':
@@ -88,21 +87,30 @@ if __name__=='__main__':
     
     #bam_file="/home/daniel/local_data/hipsci/star/test_bam_chr19_sorted.bam"
     almnt_file = HTSeq.BAM_Reader(args.bam_file)
+
+    nUnmapped = 0
+    nMultipleAlignments = 0
+    nAttributeErrors = 0
     for bundle in HTSeq.pair_SAM_alignments(almnt_file, bundle=True):
-    
+        
         if len(bundle) != 1:
+            nMultipleAlignments+=1
             continue  # Skip multiple alignments
     
         first_almnt, second_almnt = bundle[0]  # extract pair
         if not (first_almnt and second_almnt):
-    #        counts["_unmapped"] += 1
+            nUnmapped+=1
             continue
         if not first_almnt.aligned and second_almnt.aligned:
-    #        counts[ "_unmapped" ] += 1
+            nUnmapped+=1
             continue
         
         #reverse stranded library
-        first_almnt.iv =invert_strand(first_almnt.iv)
+        try:
+            first_almnt.iv =invert_strand(first_almnt.iv)
+        except AttributeError:
+            nAttributeErrors+=1
+            continue
         
     
         #for read pairs with TE first in transcript
@@ -136,3 +144,7 @@ if __name__=='__main__':
     output_counts(args.output_prefix+'_TE_only.txt',TE_only_counts)
     output_counts(args.output_prefix+'_TE_first.txt',TE_first_counts)
     output_counts(args.output_prefix+'_TE_second.txt',TE_second_counts)
+    print('{} attribute errors (iv is None)'.format(nAttributeErrors))
+    print('{} multi-mapped reads discarded'.format(nMultipleAlignments))
+    print('{} unmapped reads'.format(nUnmapped))
+
