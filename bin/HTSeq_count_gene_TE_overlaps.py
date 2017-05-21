@@ -101,6 +101,9 @@ if __name__=='__main__':
         if not (first_almnt and second_almnt):
             nUnmapped+=1
             continue
+        if (first_almnt.iv is None) or (second_almnt.iv is None):
+            nUnmapped+=1
+            continue
         if not first_almnt.aligned and second_almnt.aligned:
             nUnmapped+=1
             continue
