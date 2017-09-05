@@ -49,7 +49,7 @@ for idx in range(len(levels) - 1):
 # Load input expression data
 eDF = pd.read_csv(args.input, sep='\t', index_col=0)
 
-# Put gene data in one output file
+# Identify gene and footer ids
 gene_ids = []
 footer_ids = []
 for x in eDF.index:
@@ -59,8 +59,6 @@ for x in eDF.index:
         footer_ids.append(x)
 assert(len(footer_ids) < 15)
 
-eDF.loc[gene_ids + footer_ids,
-        :].to_csv(args.output_prefix + '_gene_id_counts.tsv', sep='\t')
 
 # Cut down matrix to just TE elements
 TE_ids = list(set(TE_df['transcript_id']) & set(eDF.index))
